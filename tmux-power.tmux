@@ -27,6 +27,7 @@ session_icon="$(tmux_get '@tmux_power_session_icon' '')"
 user_icon="$(tmux_get '@tmux_power_user_icon' '')"
 time_icon="$(tmux_get '@tmux_power_time_icon' '')"
 date_icon="$(tmux_get '@tmux_power_date_icon' '')"
+load_icon="$(tmux_get '@tmux_power_date_icon' '')"
 show_upload_speed="$(tmux_get @tmux_power_show_upload_speed false)"
 show_download_speed="$(tmux_get @tmux_power_show_download_speed false)"
 show_web_reachable="$(tmux_get @tmux_power_show_web_reachable false)"
@@ -101,17 +102,20 @@ tmux_set @prefix_highlight_copy_mode_attr "fg=$TC,bg=$BG,bold"
 tmux_set @prefix_highlight_output_prefix "#[fg=$TC]#[bg=$BG]$larrow#[bg=$TC]#[fg=$BG]"
 tmux_set @prefix_highlight_output_suffix "#[fg=$TC]#[bg=$BG]$rarrow"
 
+# Definition of various colors
+segment_color="fg=$TC,bg=$G06"
+bold_color="fg=$G04,bg=$TC,bold"
+reverse_bold_color="fg=$TC,bg=$G06,bold"
+
 #     
 # Left side of status bar
 tmux_set status-left-bg "$G04"
 tmux_set status-left-fg "$G12"
 tmux_set status-left-length 150
 user=$(whoami)
-LS="#[fg=$TC,bg=$G06,nobold]$rarrow#[fg=$TC,bg=$G06] $session_icon #S "
+LS="#[$bold_color] $session_icon #S #[fg=$TC,bg=$G04,bold]$rarrow"
 if "$show_upload_speed"; then
-    LS="$LS#[fg=$G06,bg=$G05]$rarrow#[fg=$TC,bg=$G05] $upload_speed_icon #{upload_speed} #[fg=$G05,bg=$BG]$rarrow"
-else
-    LS="$LS#[fg=$G06,bg=$BG]$rarrow"
+    LS="$LS #[$segment_color] $upload_speed_icon #{upload_speed} #[$reverse_bold_color]$rarrow"
 fi
 if [[ $prefix_highlight_pos == 'L' || $prefix_highlight_pos == 'LR' ]]; then
     LS="$LS#{prefix_highlight}"
@@ -122,9 +126,13 @@ tmux_set status-left "$LS"
 tmux_set status-right-bg "$BG"
 tmux_set status-right-fg "$G12"
 tmux_set status-right-length 150
-RS="#[fg=$G06]$larrow#[fg=$TC,bg=$G06] $time_icon $time_format #[fg=$TC,bg=$G06]$larrow#[fg=$G04,bg=$TC] $date_icon $date_format "
+load_avg="#(uptime | rev | cut -d":" -f1 | rev | sed s/,//g)"
+RS="#[$reverse_bold_color]$larrow#[$bold_color] $user_icon $user@#h"
+RS="#[$reverse_bold_color]$larrow#[$segment_color] $date_icon $date_format $RS"
+RS="#[$reverse_bold_color]$larrow#[$segment_color] $time_icon $time_format $RS"
+RS="#[$reverse_bold_color]$larrow#[$segment_color] $load_icon $load_avg $RS"
 if "$show_download_speed"; then
-    RS="#[fg=$G05,bg=$BG]$larrow#[fg=$TC,bg=$G05] $download_speed_icon #{download_speed} $RS"
+    RS="#[$arrow_color]$larrow#[$segment_color] $download_speed_icon #{download_speed} $RS"
 fi
 if "$show_web_reachable"; then
     RS=" #{web_reachable_status} $RS"
@@ -132,10 +140,6 @@ fi
 if [[ $prefix_highlight_pos == 'R' || $prefix_highlight_pos == 'LR' ]]; then
     RS="#{prefix_highlight}$RS"
 fi
-# Add segment for load average
-loadavg="#(uptime | rev | cut -d":" -f1 | rev | sed s/,//g)"
-RS="#[fg=$TC,bg=$G05] ${loadavg} $RS"
-RS="#[fg=$G04,bg=$TC,bold] $user_icon $user@#h $RS"
 tmux_set status-right "$RS"
 
 # Window status format
