@@ -132,6 +132,9 @@ fi
 if [[ $prefix_highlight_pos == 'R' || $prefix_highlight_pos == 'LR' ]]; then
     RS="#{prefix_highlight}$RS"
 fi
+# Add segment for load average
+loadavg="#(uptime | rev | cut -d":" -f1 | rev | sed s/,//g)"
+RS="#[fg=$TC,bg=$G05] ${loadavg} $RS"
 tmux_set status-right "$RS"
 
 # Window status format
