@@ -106,6 +106,7 @@ tmux_set @prefix_highlight_output_suffix "#[fg=$TC]#[bg=$BG]$rarrow"
 segment_color="fg=$TC,bg=$G06"
 bold_color="fg=$G04,bg=$TC,bold"
 reverse_bold_color="fg=$TC,bg=$G06,bold"
+separate_arrow_color="fg=$TC,bg=$G04,bold"
 
 #     
 # Left side of status bar
@@ -113,7 +114,7 @@ tmux_set status-left-bg "$G04"
 tmux_set status-left-fg "$G12"
 tmux_set status-left-length 150
 user=$(whoami)
-LS="#[$bold_color] $session_icon #S #[fg=$TC,bg=$G04,bold]$rarrow"
+LS="#[$bold_color] $session_icon #S #[$separate_arrow_color]$rarrow"
 if "$show_upload_speed"; then
     LS="$LS #[$segment_color] $upload_speed_icon #{upload_speed} #[$reverse_bold_color]$rarrow"
 fi
@@ -130,7 +131,7 @@ load_avg="#(uptime | rev | cut -d":" -f1 | rev | sed s/,//g)"
 RS="#[$reverse_bold_color]$larrow#[$bold_color] $user_icon $user@#h"
 RS="#[$reverse_bold_color]$larrow#[$segment_color] $date_icon $date_format $RS"
 RS="#[$reverse_bold_color]$larrow#[$segment_color] $time_icon $time_format $RS"
-RS="#[$reverse_bold_color]$larrow#[$segment_color] $load_icon $load_avg $RS"
+RS="#[$separate_arrow_color]$larrow#[$segment_color] $load_icon $load_avg $RS"
 if "$show_download_speed"; then
     RS="#[$arrow_color]$larrow#[$segment_color] $download_speed_icon #{download_speed} $RS"
 fi
